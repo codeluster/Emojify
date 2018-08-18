@@ -29,43 +29,44 @@ class MainActivity : AppCompatActivity() {
         val REQUEST_IMAGE_CAPTURE = 1289;
         val REQUEST_STORAGE_PERMISSION = 28497;
 
-        val FILE_PROVIDER_AUTHORITY = "com.example.android.fileprovider"
+        const val FILE_PROVIDER_AUTHORITY = "com.tanmay.emojify.fileprovider"
 
-        val LOG_TAG = MainActivity.javaClass.simpleName
+        val LOG_TAG = MainActivity::class.java.simpleName
 
     }
 
-    var mEmojifyButton: View? = null
-    var mSaveFab: View? = null
-    var mClearFab: View? = null
-    var mShareFab: View? = null
-    var mTitleBox: View? = null
-    var mImageFrame: View? = null
+    var mEmojifyButton: Button? = null
+    var mSaveFab: FloatingActionButton? = null
+    var mClearFab: FloatingActionButton? = null
+    var mShareFab: FloatingActionButton? = null
+    var mTitleBox: TextView? = null
+    var mImageFrame: ImageView? = null
 
     // Path where temp photo is stored
     var mTempPhotoPath: String? = null
 
     // Bitmap object where image is stored
-    var mResultsBitmap : Bitmap? = null
+    var mResultsBitmap: Bitmap? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mEmojifyButton = action_initiate_emojification as Button
+        mEmojifyButton = action_initiate_emojification
         mSaveFab = action_save_image
         mClearFab = action_clear_image
         mShareFab = action_share_image
         mTitleBox = title_text
         mImageFrame = imageView
 
-        val x93 = mEmojifyButton as View
-        x93.setOnClickListener {
-            emojifyMe()
-        }
+        mEmojifyButton?.setOnClickListener { emojifyMe() }
+        mSaveFab?.setOnClickListener { saveImage() }
+        mClearFab?.setOnClickListener { clearImage() }
+        mShareFab?.setOnClickListener { shareImage() }
 
     }
+
 
     // Get's executed when mEmojifyButton is pressed
     fun emojifyMe() {
@@ -77,7 +78,7 @@ class MainActivity : AppCompatActivity() {
             // If permission not granted then request it
             ActivityCompat.requestPermissions(this,
                     arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    REQUEST_STORAGE_PERMISSION);
+                    REQUEST_STORAGE_PERMISSION)
 
         } else {
             // Launch the camera if permission exists
@@ -91,9 +92,12 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
             REQUEST_STORAGE_PERMISSION -> {
                 if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // If you get permission, launch camera
-                    launchCamera();
-                } else Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
+                    // If you get permission, launch the camera
+                    launchCamera()
+                } else {
+                    // If you do not get permission, show a Toast
+                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -155,19 +159,62 @@ class MainActivity : AppCompatActivity() {
         // Toggle the views
         toggleViews()
 
+        // Resample the saved image to fit the ImageView
+        mResultsBitmap = BitmapUtils.resamplePic(this, mTempPhotoPath!!)
 
+        // Set the new Bitmap to the ImageView
+        mImageFrame?.setImageBitmap(mResultsBitmap)
+
+    }
+
+    fun toggleViews(clear: Boolean = false) {
+
+        if (clear) {
+
+            val s0f = mImageFrame as ImageView
+            s0f.setImageResource(0)
+
+            mImageFrame?.visibility = View.GONE
+            mSaveFab?.visibility = View.GONE
+            mClearFab?.visibility = View.GONE
+            mShareFab?.visibility = View.GONE
+
+            mEmojifyButton?.visibility = View.VISIBLE
+            mTitleBox?.visibility = View.VISIBLE
+
+
+        } else {
+            mEmojifyButton?.visibility = View.GONE
+            mTitleBox?.visibility = View.GONE
+
+            mImageFrame?.visibility = View.VISIBLE
+            mSaveFab?.visibility = View.VISIBLE
+            mClearFab?.visibility = View.VISIBLE
+            mShareFab?.visibility = View.VISIBLE
+        }
 
     }
 
-    fun toggleViews() {
+    fun saveImage() {
 
-        mEmojifyButton?.visibility = View.GONE
-        mTitleBox?.visibility = View.GONE
-
-        mImageFrame?.visibility = View.VISIBLE
-        mSaveFab?.visibility = View.VISIBLE
-        mClearFab?.visibility = View.VISIBLE
-        mShareFab?.visibility = View.VISIBLE
-
+        if (mTempPhotoPath != null) {
+            // Delete the temporary file
+            BitmapUtils.deleteImageFile(this, mTempPhotoPath!!)
+            // Save the high quality image
+            BitmapUtils.saveImage(this, mResultsBitmap!!)
+        }
     }
+
+    fun shareImage() {
+        saveImage()
+        BitmapUtils.shareImage(this, mTempPhotoPath!!)
+    }
+
+    fun clearImage() {
+        toggleViews(clear = true)
+
+        // Delete the temporary image file
+        BitmapUtils.deleteImageFile(this, mTempPhotoPath!!)
+    }
+
 }
