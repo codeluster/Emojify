@@ -34,16 +34,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mEmojifyButton = action_initiate_emojification
+        mEmojifyButton = action_initiate_emojification as Button
         mSaveFab = action_save_image
         mClearFab = action_clear_image
         mShareFab = action_share_image
         mTitleBox = title_text
 
+        val x93 = mEmojifyButton as View
+        x93.setOnClickListener {
+            emojifyMe()
+        }
+
     }
 
     // Get's executed when mEmojifyButton is pressed
-    fun emojifyMe(view: View) {
+    fun emojifyMe() {
 
         // Check for external storage writing permissions
         if (ContextCompat.checkSelfPermission(this,
@@ -55,28 +60,28 @@ class MainActivity : AppCompatActivity() {
                     REQUEST_STORAGE_PERMISSION);
 
         } else {
-
             // Launch the camera if permission exists
             launchCamera();
-
         }
 
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
 
-        when(requestCode){
+        when (requestCode) {
             REQUEST_STORAGE_PERMISSION -> {
-                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // If you get permission, launch camera
                     launchCamera();
-                }else Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
+                } else Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
             }
         }
 
     }
 
-    fun launchCamera(){
-        Toast.makeText(this, "Camera Launched", Toast.LENGTH_SHORT).show()
+    fun launchCamera() {
+
+
+
     }
 }
