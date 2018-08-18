@@ -1,8 +1,10 @@
 package com.example.tanmay.emojify
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -11,6 +13,8 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
+import java.io.IOException
 import java.util.jar.Manifest
 
 class MainActivity : AppCompatActivity() {
@@ -81,7 +85,22 @@ class MainActivity : AppCompatActivity() {
 
     fun launchCamera() {
 
+        // Create the capture image intent
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(packageManager) != null){
+
+            // Create the temporary file where the photo should go
+            var photoFile : File? = null
+
+            try {
+                photoFile = BitmapUtils.createTempImageFile(this)
+            }catch (ex : IOException){
+               ex.printStackTrace()
+            }
+
+        }
 
     }
 }
