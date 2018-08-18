@@ -2,12 +2,15 @@ package com.example.tanmay.emojify
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.FileProvider
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -25,6 +28,8 @@ class MainActivity : AppCompatActivity() {
 
         val FILE_PROVIDER_AUTHORITY = "com.example.android.fileprovider"
 
+        val LOG_TAG = MainActivity.javaClass.simpleName
+
     }
 
     var mEmojifyButton: Button? = null
@@ -32,6 +37,9 @@ class MainActivity : AppCompatActivity() {
     var mClearFab: FloatingActionButton? = null
     var mShareFab: FloatingActionButton? = null
     var mTitleBox: TextView? = null
+
+    // Path where temp photo is stored
+    var mTempPhotoPath: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,17 +97,34 @@ class MainActivity : AppCompatActivity() {
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
         // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(packageManager) != null){
+        if (takePictureIntent.resolveActivity(packageManager) != null) {
 
             // Create the temporary file where the photo should go
-            var photoFile : File? = null
+            var photoFile: File? = null
 
             try {
                 photoFile = BitmapUtils.createTempImageFile(this)
-            }catch (ex : IOException){
-               ex.printStackTrace()
+            } catch (ex: IOException) {
+                ex.printStackTrace()
             }
 
+            // Get the path of the temporary file
+            mTempPhotoPath = photoFile?.absolutePath
+
+            if (photoFile != null) {
+
+                // Get the content Uri for the image file
+                val photoUri: Uri = FileProvider.getUriForFile(this,
+                        FILE_PROVIDER_AUTHORITY,
+                        photoFile)
+
+                // Add the Uri sp the camera can store the image
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+
+                // Launch the camera activity
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+
+            } else Log.e(LOG_TAG, "Problem launching camera. photoFile was null.")
         }
 
     }
