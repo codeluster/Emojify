@@ -1,7 +1,9 @@
 package com.example.tanmay.emojify
 
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -13,6 +15,7 @@ import android.support.v4.content.FileProvider
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
@@ -32,14 +35,18 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    var mEmojifyButton: Button? = null
-    var mSaveFab: FloatingActionButton? = null
-    var mClearFab: FloatingActionButton? = null
-    var mShareFab: FloatingActionButton? = null
-    var mTitleBox: TextView? = null
+    var mEmojifyButton: View? = null
+    var mSaveFab: View? = null
+    var mClearFab: View? = null
+    var mShareFab: View? = null
+    var mTitleBox: View? = null
+    var mImageFrame: View? = null
 
     // Path where temp photo is stored
     var mTempPhotoPath: String? = null
+
+    // Bitmap object where image is stored
+    var mResultsBitmap : Bitmap? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +58,7 @@ class MainActivity : AppCompatActivity() {
         mClearFab = action_clear_image
         mShareFab = action_share_image
         mTitleBox = title_text
+        mImageFrame = imageView
 
         val x93 = mEmojifyButton as View
         x93.setOnClickListener {
@@ -126,6 +134,40 @@ class MainActivity : AppCompatActivity() {
 
             } else Log.e(LOG_TAG, "Problem launching camera. photoFile was null.")
         }
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        // If the image capture activity was successful
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            // Process the image and set it to the ImageView
+            processAndSetImage()
+        } else {
+            // Otherwise, delete the temporary image file
+            BitmapUtils.deleteImageFile(this, mTempPhotoPath!!)
+        }
+
+    }
+
+    fun processAndSetImage() {
+
+        // Toggle the views
+        toggleViews()
+
+
+
+    }
+
+    fun toggleViews() {
+
+        mEmojifyButton?.visibility = View.GONE
+        mTitleBox?.visibility = View.GONE
+
+        mImageFrame?.visibility = View.VISIBLE
+        mSaveFab?.visibility = View.VISIBLE
+        mClearFab?.visibility = View.VISIBLE
+        mShareFab?.visibility = View.VISIBLE
 
     }
 }
