@@ -206,8 +206,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun shareImage() {
-        saveImage()
-        BitmapUtils.shareImage(this, mTempPhotoPath!!)
+
+        if (mTempPhotoPath != null && mResultsBitmap != null) {
+            // Delete the temporary image file
+            BitmapUtils.deleteImageFile(this, mTempPhotoPath!!)
+
+            // Save the image
+            BitmapUtils.saveImage(this, mResultsBitmap!!)
+
+            // Share the image
+            BitmapUtils.shareImage(this, mTempPhotoPath!!)
+        }
     }
 
     fun clearImage() {

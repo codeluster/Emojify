@@ -174,6 +174,7 @@ class BitmapUtils {
             val photoUri = FileProvider.getUriForFile(context, FILE_PROVIDER_AUTHORITY, f)
             shareIntent.putExtra(Intent.EXTRA_STREAM, photoUri)
             context.startActivity(shareIntent)
+
         }
 
     }
