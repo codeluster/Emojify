@@ -33,7 +33,7 @@ class Emojifier {
             val frame = Frame.Builder().setBitmap(image).build()
 
             // faces is a collection of Face instances
-            var faces: SparseArray<Face> = detector.detect(frame)
+            val faces = detector.detect(frame)
 
             // Log the number of faces
             Log.d(LOG_TAG, "detectFaces : number of faces = " + faces.size());
@@ -41,14 +41,30 @@ class Emojifier {
             // If there are no faces detected, show a Toast
             if (faces.size() == 0) {
                 Toast.makeText(context, R.string.no_faces_message, Toast.LENGTH_SHORT).show();
+            } else {
+
+                for (i in 0 until faces.size()) {
+                    val face = faces.valueAt(i)
+
+                    // Log the classification probabilities for each face.
+                    getClassifications(face)
+                }
+
             }
 
             detector.release()
 
         }
 
-        fun getClassifications() {
+        fun getClassifications(face: Face) {
 
+            val smilingProbaility = face.isSmilingProbability
+            val leftEyeOpenProbability = face.isLeftEyeOpenProbability
+            val rightEyeOpenProbability = face.isRightEyeOpenProbability
+
+            Log.d(LOG_TAG, "getClassifications : smilingProbaility = $smilingProbaility ")
+            Log.d(LOG_TAG, "getClassifications : leftEyeOpenProbability = $leftEyeOpenProbability ")
+            Log.d(LOG_TAG, "getClassifications : rightEyeOpenProbability = $rightEyeOpenProbability ")
 
         }
 
