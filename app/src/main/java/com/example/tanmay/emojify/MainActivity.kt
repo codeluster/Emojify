@@ -162,6 +162,8 @@ class MainActivity : AppCompatActivity() {
         // Resample the saved image to fit the ImageView
         mResultsBitmap = BitmapUtils.resamplePic(this, mTempPhotoPath!!)
 
+        Emojifier.detectFaces(this, mResultsBitmap!!)
+
         // Set the new Bitmap to the ImageView
         mImageFrame?.setImageBitmap(mResultsBitmap)
 

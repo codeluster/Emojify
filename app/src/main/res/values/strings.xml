@@ -3,4 +3,6 @@
     <string name="action_initiate_text">GO!</string>
     <!-- Toast when permission denied during runtime -->
     <string name="permission_denied">Access to certain features is required for proper functioning.</string>
+    <!-- Toast when no face is detected in the image -->
+    <string name="no_faces_message">No faces detected in the image.</string>
 </resources>
